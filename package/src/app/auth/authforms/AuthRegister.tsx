@@ -1,13 +1,26 @@
+"use client";
+
 import { Button, Label, TextInput } from "flowbite-react";
-import Link from "next/link";
-import React from "react";
-
-
+import React, { useState } from "react";
+import userService from '../../../api/userService'; // Adjust the import path as needed
 
 const AuthRegister = () => {
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
+  const handleSignUp = React.useCallback(async () => {
+    try {
+      const response = await userService.signUp(name, password, email);
+      console.log('User registered successfully:', response);
+    } catch (error) {
+      console.error('Error registering user:', error);
+    }
+  }, [name, password, email]);
+
   return (
     <>
-      <form>
+      <form onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
         <div className="mb-4">
           <div className="mb-2 block">
             <Label htmlFor="name" value="Name" />
@@ -17,19 +30,25 @@ const AuthRegister = () => {
             type="text"
             sizing="md"
             className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
+
         <div className="mb-4">
           <div className="mb-2 block">
-            <Label htmlFor="emadd" value="Email Address" />
+            <Label htmlFor="email" value="Email" />
           </div>
           <TextInput
-            id="emadd"
-            type="text"
+            id="email"
+            type="email"
             sizing="md"
             className="form-control"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
+
         <div className="mb-6">
           <div className="mb-2 block">
             <Label htmlFor="userpwd" value="Password" />
@@ -39,13 +58,14 @@ const AuthRegister = () => {
             type="password"
             sizing="md"
             className="form-control"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div> 
-        <Button color={'primary'} className="w-full">Sign Up</Button> 
-        
+        <Button type="submit" color={'primary'} className="w-full">Sign Up</Button> 
       </form>
     </>
   )
 }
 
-export default AuthRegister
+export default AuthRegister;
