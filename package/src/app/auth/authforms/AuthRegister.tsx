@@ -2,6 +2,8 @@ import { Button, Label, TextInput } from "flowbite-react";
 import Link from "next/link";
 import React from "react";
 
+
+
 const AuthRegister = () => {
   return (
     <>
