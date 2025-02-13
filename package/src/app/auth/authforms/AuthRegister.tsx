@@ -1,31 +1,31 @@
 "use client";
 
-import {Alert, Button, Label, TextInput} from "flowbite-react";
-import React, {useState} from "react";
+import {Button, Label, TextInput} from "flowbite-react";
+import React, {useRef, useState} from "react";
 import userService from '../../../api/userService';
-import {HiInformationCircle} from "react-icons/hi"; // Adjust the import path as needed
+import {Toast} from "primereact/toast";
+import "primereact/resources/themes/lara-light-cyan/theme.css";
+import {useRouter} from "next/navigation";
+
 
 const AuthRegister = () => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const toast = useRef<Toast>(null);
+    const router = useRouter();
 
     const handleSignUp = React.useCallback(async () => {
         try {
-            const response = await userService.signUp(name, password, email);
-            console.log('User registered successfully:', response);
+            const item: any = await userService.signUp(name, password, email);
+            toast.current?.show({ severity: 'success', summary: 'Success', detail: item?.response?.data?.message });
+            setTimeout(() => {
+                router.push('/auth/login');
+            }, 500)
         } catch (error: any) {
-            <Alert
-                color="error"
-                icon={HiInformationCircle}
-                className="rounded-md"
-            >
-                <span className="font-medium">Danger</span> - A simple Danger
-                alert
-            </Alert>
-            console.error('Error registering user:', error?.response?.data?.message);
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.message });
         }
-    }, [name, password, email]);
+    }, [name, password, email, router]);
 
     return (
         <>
@@ -75,6 +75,9 @@ const AuthRegister = () => {
                     />
                 </div>
                 <Button type="submit" color={'primary'} className="w-full">Sign Up</Button>
+                <div className="card flex justify-content-center">
+                    <Toast ref={toast}/>
+                </div>
             </form>
         </>
     )
