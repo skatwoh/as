@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import { Badge, Button, Navbar } from "flowbite-react";
 import { Icon } from "@iconify/react";
 import Profile from "./Profile";
@@ -7,9 +7,39 @@ import FullLogo from "../../shared/logo/FullLogo";
 import { Drawer } from "flowbite-react";
 import MobileSidebar from "../sidebar/MobileSidebar";
 import Link from "next/link";
+import {deleteCookie} from "cookies-next";
+import {useRouter} from "next/navigation";
+import {Toast} from "primereact/toast";
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const toast = useRef<Toast>(null);
+
+  const handleLogout = () => {
+    try {
+      setLoading(true);
+      // ✅ Xóa token khỏi cookies
+      deleteCookie("token");
+
+      // ✅ Hiển thị thông báo
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Đăng xuất thành công!",
+      });
+    } catch (error: any) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Lỗi đăng xuất!",
+      });
+    } finally {
+      router.push("/auth/login");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +62,14 @@ const Header = () => {
   const handleClose = () => setIsOpen(false);
   return (
     <>
+      {loading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-white"></div>
+              <p className="text-white mt-4 text-lg">Đang đăng nhập...</p>
+            </div>
+          </div>
+      )}
       <header
         className={`sticky top-0 z-[5] ${
           isSticky
@@ -63,7 +101,7 @@ const Header = () => {
               {/*<Button as={Link} href="https://www.wrappixel.com/templates/materialm-next-js-tailwind-dashboard-template/?ref=33" target="_blank" size={'sm'} color={"primary"}>*/}
               {/*  Upgrade To Pro */}
               {/*</Button>*/}
-              <Profile />
+              <Profile handleLogout={handleLogout}/>
             </div>
           </div>
         </Navbar>
@@ -75,6 +113,7 @@ const Header = () => {
           <MobileSidebar />
         </Drawer.Items>
       </Drawer>
+      <Toast ref={toast} position="bottom-left"/>
     </>
   );
 };

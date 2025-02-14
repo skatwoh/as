@@ -1,12 +1,12 @@
 "use client";
 
-import {Button, Checkbox, Label, TextInput} from "flowbite-react";
+import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import Link from "next/link";
-import React, {useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import userService from "@/api/userService";
 import { setCookie } from "cookies-next";
-import {Toast} from "primereact/toast";
-import {useRouter} from "next/navigation";
+import { Toast } from "primereact/toast";
+import { useRouter } from "next/navigation";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 
 const AuthLogin = () => {
@@ -14,12 +14,31 @@ const AuthLogin = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const [formData, setFormData] = useState<any>({
-    username: '',
-    password: ''
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
   });
 
-  const handleLogin = React.useCallback(async () => {
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  const handleLogin = async () => {
+    // Reset lỗi trước khi kiểm tra
+    setErrors({});
+
+    let newErrors: { username?: string; password?: string } = {};
+
+    if (!formData.username) {
+      newErrors.username = "Vui lòng nhập Username";
+    }
+    if (!formData.password) {
+      newErrors.password = "Vui lòng nhập Password";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return; // Không gửi request nếu có lỗi
+    }
+
     try {
       setLoading(true);
       const item: any = await userService.signIn(formData.username, formData.password);
@@ -28,22 +47,27 @@ const AuthLogin = () => {
       if (token) {
         const expiresDate = new Date();
         expiresDate.setDate(expiresDate.getDate() + 7);
-        setCookie("token", token, {expires: expiresDate, path: "/"});
-        toast.current?.show({ severity: 'success', summary: 'Success', detail: "Đăng nhập thành công" });
+        setCookie("token", token, { expires: expiresDate, path: "/" });
+        toast.current?.show({ severity: "success", summary: "Success", detail: "Đăng nhập thành công" });
         router.push("/");
       }
     } catch (error: any) {
-      toast.current?.show({ severity: 'error', summary: 'Error', detail: error?.response?.data?.message });
+      toast.current?.show({ severity: "error", summary: "Error", detail: error?.response?.data?.message });
     } finally {
       setLoading(false);
     }
-
-  },[formData.username, formData.password, router])
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: e.target.value,
+    }));
+
+    // Xóa lỗi khi người dùng nhập lại dữ liệu
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: "",
     }));
   };
 
@@ -57,13 +81,15 @@ const AuthLogin = () => {
               </div>
             </div>
         )}
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleLogin();
-        }}>
+        <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+        >
           <div className="mb-4">
             <div className="mb-2 block">
-              <Label htmlFor="Username" value="Username"/>
+              <Label htmlFor="username" value="Username" />
             </div>
             <TextInput
                 id="username"
@@ -73,10 +99,12 @@ const AuthLogin = () => {
                 value={formData.username}
                 onChange={(e) => handleChange(e, "username")}
             />
+            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
           </div>
+
           <div className="mb-4">
             <div className="mb-2 block">
-              <Label htmlFor="userpwd" value="Password"/>
+              <Label htmlFor="userpwd" value="Password" />
             </div>
             <TextInput
                 id="userpwd"
@@ -86,27 +114,28 @@ const AuthLogin = () => {
                 value={formData.password}
                 onChange={(e) => handleChange(e, "password")}
             />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
+
           <div className="flex justify-between my-5">
             <div className="flex items-center gap-2">
-              <Checkbox id="accept" className="checkbox"/>
-              <Label
-                  htmlFor="accept"
-                  className="opacity-90 font-normal cursor-pointer"
-              >
-                Remeber this Device
+              <Checkbox id="accept" className="checkbox" />
+              <Label htmlFor="accept" className="opacity-90 font-normal cursor-pointer">
+                Remember this Device
               </Label>
             </div>
             <Link href={"/"} className="text-primary text-sm font-medium">
               Forgot Password ?
             </Link>
           </div>
+
           <Button color={"primary"} className="w-full" type={"submit"}>
             Sign in
           </Button>
         </form>
+
         <div className="card flex justify-content-center">
-          <Toast ref={toast}/>
+          <Toast ref={toast} />
         </div>
       </>
   );
