@@ -34,6 +34,17 @@ const SidebarContent: MenuItem[] = [
     ],
   },
   {
+    heading: "Accounts Management",
+    children: [
+      {
+        name: "List Accounts",
+        icon: "solar:clipboard-list-line-duotone",
+        id: uniqueId(),
+        url: "/accounts/list-accounts",
+      },
+    ],
+  },
+  {
     heading: "Utilities",
     children: [
       {

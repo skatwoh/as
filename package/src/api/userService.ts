@@ -12,8 +12,22 @@ const signIn = async (username: string, password: string) => {
     return res;
 }
 
+const listUsers = async (page: number, size: number) => {
+    try {
+        const response = await axios.get(`${apiUrl}/list-user`, {
+            params: { page, size },
+            withCredentials: true, // Bật gửi cookie
+        });
+        return response?.data;
+    } catch (error) {
+        throw "Không có quyền"
+    }
+};
+
+
+
 const apiService = {
-    signUp, signIn
+    signUp, signIn, listUsers
 }
 
 export default apiService;
