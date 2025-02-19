@@ -1,17 +1,18 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { getCookie } from "cookies-next";
-import { Inter } from "next/font/google";
+import {useRouter, usePathname} from "next/navigation";
+import React, {useEffect, useState} from "react";
+import {deleteCookie, getCookie} from "cookies-next";
+import {Inter} from "next/font/google";
 import "simplebar-react/dist/simplebar.min.css";
 import "./css/globals.css";
-import { Flowbite, ThemeModeScript } from "flowbite-react";
+import {Flowbite, ThemeModeScript} from "flowbite-react";
 import customTheme from "@/utils/theme/custom-theme";
+import {jwtDecode} from "jwt-decode";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({subsets: ["latin"]});
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({children}: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const [isAuthChecked, setIsAuthChecked] = useState(false);
@@ -19,11 +20,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     useEffect(() => {
         const token = getCookie("token"); // Lấy token từ cookie
         const publicRoutes = ["/auth/login", "/auth/register"];
-
-        if (!token && !publicRoutes.includes(pathname)) {
-            router.replace("/auth/login"); // Chuyển hướng ngay lập tức
-        } else {
-            setIsAuthChecked(true); // Cho phép render nội dung
+        if (token) {
+            const decoded = jwtDecode(token);
+            if (decoded) {
+                const currentTime = Math.floor(Date.now() / 1000);
+                // @ts-ignore
+                if (currentTime >= decoded.exp) {
+                    deleteCookie("token");
+                    router.replace("/auth/login");
+                    setIsAuthChecked(true);
+                } else {
+                    setIsAuthChecked(true);
+                }
+            }
+        } else if (!token && !publicRoutes.includes(pathname)) {
+            router.replace("/auth/login");
+            setIsAuthChecked(true);
         }
     }, [pathname, router]);
 
@@ -31,8 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         return (
             <html lang="en">
             <head>
-                <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-                <ThemeModeScript />
+                <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+                <ThemeModeScript/>
             </head>
             <body className={`${inter.className}`}>
             <div className="flex items-center justify-center min-h-screen">
@@ -51,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <head>
-            <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+            <link rel="icon" href="/noun-cloud-5430924.svg" type="image/svg+xml"/>
             <ThemeModeScript/>
         </head>
         <body className={`${inter.className}`}>
