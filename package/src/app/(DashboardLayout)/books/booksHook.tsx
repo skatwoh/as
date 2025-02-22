@@ -1,4 +1,6 @@
-import { Space, TableProps, Tag } from 'antd'; // Import TableProps từ antd
+import bookService from '@/api/bookService';
+import { Space, TableProps } from 'antd'; // Import TableProps từ antd
+import { useEffect, useState } from 'react';
 
 interface DataType {
     key: string;
@@ -8,78 +10,123 @@ interface DataType {
     tags: string[];
 }
 
+interface BookType {
+    title: string;
+    author: string;
+    genre: string;
+    published: Date;
+    publisher: string;
+    description: string;
+    imageUrl: string;
+}
+
 export function useBooks() {
+    const [listBook, setListBook] = useState<BookType[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
+    const [book, setBook] = useState<BookType>({
+        title: "",
+        author: "",
+        genre: "",
+        published: new Date(),
+        publisher: "",
+        description: "",
+        imageUrl: ""
+    });
+
+    const getListBook = async () => {
+        const data: any = await bookService.listBook(1, 10);
+        setListBook(data?.data?.content)
+    }
+
+    const handleOpenAddModal = () => {
+        setIsModalOpen(true);
+    }
+
+    const handleOpenUpdateModal = (book: BookType) => {
+        setIsModalOpen(true);
+        setIsUpdate(true);
+    }
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setIsUpdate(false);
+    }
+
+    const handleSaveBook = (id: number) => {
+        if (id) {
+            bookService.updateBook(book, id);
+        }
+        else {
+            bookService.addBook(book);
+        }
+    }
+
     const columns: TableProps<DataType>['columns'] = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
             render: (text) => <a>{text}</a>,
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
+            title: 'Author',
+            dataIndex: 'author',
+            key: 'author',
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
+            title: 'Genre',
+            dataIndex: 'genre',
+            key: 'genre',
         },
         {
-            title: 'Tags',
-            key: 'tags',
-            dataIndex: 'tags',
-            render: (_, { tags }) => (
-                <>
-                    {tags.map((tag) => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag === 'loser') {
-                            color = 'volcano';
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
-            ),
+            title: 'Published',
+            key: 'published',
+            dataIndex: 'published',
+        },
+        {
+            title: 'Publisher',
+            key: 'publisher',
+            dataIndex: 'publisher',
+        },
+        {
+            title: 'Description',
+            key: 'description',
+            dataIndex: 'description',
+        },
+        {
+            title: 'ImageUrl',
+            key: 'imageUrl',
+            dataIndex: 'imageUrl',
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a>Invite {record.name}</a>
+                    <a>Update</a>
                     <a>Delete</a>
                 </Space>
             ),
         },
     ];
 
-    const data: DataType[] = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
-        },
-    ];
-    return { columns , data};
+    useEffect(() => {
+        getListBook();
+    }, []);
+
+    useEffect(() => {
+        console.log(listBook, "list")
+    })
+
+    return {
+        columns,
+        listBook,
+        isModalOpen,
+        handleOpenAddModal,
+        handleOpenUpdateModal,
+        handleCloseModal,
+        handleSaveBook,
+        isUpdate
+    };
 }

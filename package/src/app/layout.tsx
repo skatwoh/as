@@ -9,6 +9,7 @@ import "./css/globals.css";
 import {Flowbite, ThemeModeScript} from "flowbite-react";
 import customTheme from "@/utils/theme/custom-theme";
 import {jwtDecode} from "jwt-decode";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const inter = Inter({subsets: ["latin"]});
 
