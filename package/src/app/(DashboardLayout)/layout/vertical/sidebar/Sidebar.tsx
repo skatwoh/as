@@ -36,7 +36,6 @@ const SidebarLayout = () => {
                         className="text-ld block mx-auto mt-6 leading-6 dark:text-opacity-60 hide-icon"
                         height={18}
                       />
-
                       {item.children?.map((child, index) => (
                         <React.Fragment key={child.id && index}>
                           {child.children ? (

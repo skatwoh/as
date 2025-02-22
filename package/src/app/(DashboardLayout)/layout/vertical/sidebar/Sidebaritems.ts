@@ -45,6 +45,17 @@ const SidebarContent: MenuItem[] = [
     ],
   },
   {
+    heading: "Category",
+    children: [
+      {
+        name: "Books",
+        icon: "solar:clipboard-list-line-duotone",
+        id: uniqueId(),
+        url: "/books",
+      },
+    ],
+  },
+  {
     heading: "Utilities",
     children: [
       {
