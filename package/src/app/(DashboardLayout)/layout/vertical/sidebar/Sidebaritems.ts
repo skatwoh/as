@@ -49,9 +49,21 @@ const SidebarContent: MenuItem[] = [
     children: [
       {
         name: "Books",
-        icon: "solar:clipboard-list-line-duotone",
+        icon: "solar:book-2-broken",
         id: uniqueId(),
         url: "/books",
+      },
+      {
+        name: "Category",
+        icon: "solar:diploma-broken",
+        id: uniqueId(),
+        url: "/category",
+      },
+      {
+        name: "Author",
+        icon: "solar:user-circle-linear",
+        id: uniqueId(),
+        url: "/author",
       },
     ],
   },

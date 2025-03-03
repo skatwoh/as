@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.0",
     "antd": "^5.24.1",
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "react-redux": "^9.2.0"
   }
 }

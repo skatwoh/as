@@ -1,34 +1,29 @@
 "use client";
-// import { useDispatch, useSelector } from "react-redux";
-import { useBooks } from "./booksHook";
 import { Button, DatePicker, Form, Input, Modal, Table } from 'antd'; // Import TableProps từ antd
-import { decrement, increment } from "@/app/Redux/counterSlice";
-import { decrement2, increment2 } from "@/app/Redux/counterSlice2";
+import { useCategory } from './categoryHook';
 
 export default function Page() {
   const {
     columns,
-    listBook,
+    listCategory,
     isModalOpen,
     handleOpenAddModal,
     handleOpenUpdateModal,
     handleCloseModal,
-    handleSaveBook,
+    handleSaveCategory,
     isUpdate,
     handleOnchangeInputModal
-  } = useBooks();
-  // const count = useSelector((state: any) => state.counter.value)
-  // const count2 = useSelector((state: any) => state.counter2.value)
-  // const dispatch = useDispatch()
+  } = useCategory();
+
   return (
     <div>
       <div className="w-100 mb-3 d-flex justify-content-end">
         <Button type="primary" onClick={handleOpenAddModal}>
-          Add Book
+          Add Category
         </Button>
       </div>
-      <Table columns={columns} dataSource={listBook} />
-      <Modal title={isUpdate ? "Update book" : "Add book"} open={isModalOpen} onOk={handleSaveBook} onCancel={handleCloseModal}
+      <Table columns={columns} dataSource={listCategory} />
+      <Modal title={isUpdate ? "Update category" : "Add category"} open={isModalOpen} onOk={handleSaveCategory} onCancel={handleCloseModal}
         width={800}>
         <Form layout="vertical" onValuesChange={handleOnchangeInputModal}>
           <div className="container">
